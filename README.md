@@ -2,9 +2,37 @@
 
 **Kaggle Competition Solution** - [H&M Personalized Fashion Recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/overview)
 
+[![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Competition-orange.svg)](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
+[![Rank](https://img.shields.io/badge/Rank-45%2F3006-brightgreen.svg)](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/leaderboard)
+[![Score](https://img.shields.io/badge/Score-0.0292-yellow.svg)](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/leaderboard)
+
 ![background](./imgs/img1.png)
 
 ![rank](./imgs/img2.png)
+
+## 📋 Table of Contents
+
+- [🏆 Competition Results](#-competition-results)
+- [🎯 Solution Overview](#-solution-overview)
+- [🚀 Quick Start](#-quick-start)
+- [📥 Pre-trained Embeddings](#-pre-trained-embeddings)
+- [📁 Project Structure](#-project-structure)
+- [🔧 Technical Architecture](#-technical-architecture)
+- [👥 About the Team](#-about-the-team)
+
+## 🎯 Quick Summary
+
+| Metric | Value |
+|--------|-------|
+| **Competition Rank** | 45th out of 3,006 teams |
+| **Public Score** | 0.0292 |
+| **Private Score** | 0.02996 |
+| **Improvement** | +0.0006 over single strategy |
+| **Architecture** | Two-stage retrieval + ranking |
+| **Models** | LightGBM + DNN ensemble |
+| **Memory** | Optimized for 50GB RAM |
 
 ## 🏆 Competition Results
 
@@ -163,6 +191,33 @@ Project Organization
 - **Quality Control**: Positive rate monitoring and adaptive candidate filtering
 - **Modular Design**: Reusable components for different recommendation scenarios
 - **Comprehensive Documentation**: Sphinx-generated API documentation
+
+## 🛠️ Technologies & Skills Demonstrated
+
+### **Machine Learning & AI**
+- **Recommendation Systems**: Collaborative filtering, content-based filtering, hybrid approaches
+- **Deep Learning**: Neural networks for ranking and embedding generation
+- **Ensemble Methods**: Model blending and stacking techniques
+- **Feature Engineering**: Temporal, behavioral, and product features
+
+### **Data Engineering**
+- **Large-Scale Processing**: 50GB+ dataset optimization
+- **Memory Management**: Efficient data types and batch processing
+- **Data Pipeline**: End-to-end ETL with quality control
+- **Embedding Generation**: Word2Vec, DSSM, YouTube-style embeddings
+
+### **Software Engineering**
+- **Modular Architecture**: Clean separation of concerns
+- **Documentation**: Comprehensive API docs with Sphinx
+- **Testing**: Professional project structure with testing setup
+- **Version Control**: Proper Git workflow and contribution guidelines
+
+### **Tools & Frameworks**
+- **Python**: pandas, numpy, scikit-learn, lightgbm
+- **Deep Learning**: TensorFlow, Keras
+- **Collaborative Filtering**: implicit library (ALS, BPR)
+- **Documentation**: Sphinx, Jupyter notebooks
+- **Development**: pytest, black, flake8
 
 ## 👥 About the Team
 

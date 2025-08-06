@@ -1,3 +1,11 @@
+"""
+Data processing utilities for the H&M Fashion Recommendation System.
+
+This module provides the DataHelper class which handles all data loading,
+preprocessing, encoding, and feature engineering tasks. It implements
+a complete data pipeline from raw CSV files to model-ready datasets.
+"""
+
 import pandas as pd
 import pickle
 import os
@@ -8,7 +16,21 @@ from pathlib import Path
 
 
 class DataHelper:
-    """Helper class for loadiing, preprocessing and saving data."""
+    """Helper class for loading, preprocessing and saving data.
+    
+    This class provides a comprehensive interface for managing the H&M dataset
+    throughout the recommendation pipeline. It handles:
+    
+    1. Raw data loading from CSV files
+    2. ID encoding (converting string IDs to integers)
+    3. Feature engineering (gender inference, seasonal classification)
+    4. Categorical feature encoding
+    5. Memory optimization
+    6. Data persistence and loading
+    
+    The class follows a pipeline approach where data is processed once and
+    cached for subsequent use, improving efficiency for large datasets.
+    """
 
     def __init__(self, data_dir: str, raw_dir: str = "raw"):
         """Initialize DataHelper.
@@ -16,22 +38,29 @@ class DataHelper:
         Parameters
         ----------
         data_dir : str
-            Data directory.
+            Root directory containing all data files
         raw_dir : str
-            Subdirectory to store raw data.
+            Subdirectory name containing raw CSV files, by default "raw"
         """
-        self.base = Path(data_dir)  # data diectory
-        self.raw_dir = self.base / raw_dir  # raw data directory
+        self.base = Path(data_dir)  # Root data directory
+        self.raw_dir = self.base / raw_dir  # Raw data subdirectory
 
     def _load_raw_data(self) -> dict:
-        """Load original raw data
+        """Load original raw data from CSV files.
+        
+        Loads the three main CSV files from the H&M dataset:
+        - articles.csv: Product information
+        - customers.csv: Customer demographics and preferences  
+        - transactions_train.csv: Historical purchase data
 
         Returns
         -------
         dict
-            Data dictionary, keys: 'item', 'user', 'inter'.
+            Dictionary with keys: 'item', 'user', 'inter' containing
+            the respective pandas DataFrames
         """
 
+        # Load the three main dataset files
         articles = pd.read_csv(self.raw_dir / "articles.csv")
         customers = pd.read_csv(self.raw_dir / "customers.csv")
         inter = pd.read_csv(self.raw_dir / "transactions_train.csv")
@@ -39,61 +68,79 @@ class DataHelper:
         return {"item": articles, "user": customers, "inter": inter}
 
     def _encode_id(self, data: dict, map_dir: str) -> dict:
-        """Encode user and item id as integers
+        """Encode user and item IDs as integers for efficient processing.
+        
+        This method converts string IDs to integer indices (1-based) and creates
+        mapping dictionaries for reverse lookup. The mappings are cached to disk
+        for reuse across sessions.
+        
+        The encoding is crucial for:
+        - Memory efficiency (integers vs strings)
+        - Compatibility with embedding matrices
+        - Faster lookups and joins
 
         Parameters
         ----------
         data : dict
-            Raw data dictionary, keys: 'item', 'user', 'inter'.
+            Raw data dictionary with 'item', 'user', 'inter' DataFrames
         map_dir : str
-            Relative directory to store index-id-maps.
+            Relative directory path to store ID mapping files
 
         Returns
         -------
         dict
-            Encoded data dictionary, keys: 'item', 'user', 'inter'.
+            Data dictionary with encoded integer IDs in all DataFrames
         """
+        # Create mapping directory if it doesn't exist
         if not os.path.isdir(self.base / map_dir):
             os.mkdir(self.base / map_dir)
 
+        # Extract dataframes for processing
         user = data["user"]
         item = data["item"]
         inter = data["inter"]
 
+        # Define paths for mapping files (cached for reuse)
         user_id2index_path = self.base / map_dir / "user_id2index.pkl"
         user_index2id_path = self.base / map_dir / "user_index2id.pkl"
         item_id2index_path = self.base / map_dir / "item_id2index.pkl"
         item_index2id_path = self.base / map_dir / "item_index2id.pkl"
 
+        # Load or create user ID to index mapping (1-based indexing)
         if not os.path.exists(user_id2index_path):
             user_id2index_dict = dict(zip(user["customer_id"], user.index + 1))
             pickle.dump(user_id2index_dict, open(user_id2index_path, "wb"))
         else:
             user_id2index_dict = pickle.load(open(user_id2index_path, "rb"))
 
+        # Load or create user index to ID mapping (reverse lookup)
         if not os.path.exists(user_index2id_path):
             user_index2id_dict = dict(zip(user.index + 1, user["customer_id"]))
             pickle.dump(user_index2id_dict, open(user_index2id_path, "wb"))
         else:
             user_index2id_dict = pickle.load(open(user_index2id_path, "rb"))
 
+        # Load or create item ID to index mapping (1-based indexing)
         if not os.path.exists(item_id2index_path):
             item_id2index_dict = dict(zip(item["article_id"], item.index + 1))
             pickle.dump(item_id2index_dict, open(item_id2index_path, "wb"))
         else:
             item_id2index_dict = pickle.load(open(item_id2index_path, "rb"))
 
+        # Load or create item index to ID mapping (reverse lookup)
         if not os.path.exists(item_index2id_path):
             item_index2id_dict = dict(zip(item.index + 1, item["article_id"]))
             pickle.dump(item_index2id_dict, open(item_index2id_path, "wb"))
         else:
             item_index2id_dict = pickle.load(open(item_index2id_path, "rb"))
 
+        # Apply ID mappings to convert string IDs to integers
         inter["customer_id"] = inter["customer_id"].map(user_id2index_dict)
         inter["article_id"] = inter["article_id"].map(item_id2index_dict)
         user["customer_id"] = user["customer_id"].map(user_id2index_dict)
         item["article_id"] = item["article_id"].map(item_id2index_dict)
 
+        # Update data dictionary with encoded dataframes
         data["user"] = user
         data["item"] = item
         data["inter"] = inter

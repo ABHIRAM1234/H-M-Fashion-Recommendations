@@ -1,3 +1,11 @@
+"""
+Retrieval candidate collection utilities for the H&M Fashion Recommendation System.
+
+This module provides the RuleCollector class which orchestrates multiple retrieval
+rules to generate candidate items for each user. It handles rule execution,
+score normalization, quality filtering, and result aggregation.
+"""
+
 import pandas as pd
 import numpy as np
 from typing import List
@@ -7,7 +15,20 @@ from ..utils import calc_valid_date
 
 
 class RuleCollector:
-    """Collect retrieval candidates by rules"""
+    """Collect retrieval candidates by rules.
+    
+    This class orchestrates the execution of multiple retrieval rules to generate
+    candidate items for each user. It provides a unified interface for:
+    
+    1. Executing multiple retrieval rules in sequence
+    2. Normalizing and filtering rule scores
+    3. Quality control based on positive rates
+    4. Aggregating results from different rules
+    5. Compressing results for efficient storage
+    
+    The class implements a two-stage approach: first generating candidates with
+    individual rules, then filtering and combining them based on quality metrics.
+    """
 
     def collect(
         self,
@@ -22,35 +43,46 @@ class RuleCollector:
         norm_type: str = "quantile",
         compress=True,
     ) -> pd.DataFrame:
-        """Collect retreival results
+        """Collect retrieval results from multiple rules.
+        
+        This method executes a list of retrieval rules and combines their results
+        into a unified candidate set. It includes quality control mechanisms to
+        ensure the generated candidates have sufficient positive rates for training.
+        
+        The process involves:
+        1. Preparing validation data for quality assessment
+        2. Applying filter rules to remove unwanted items
+        3. Executing each retrieval rule with score normalization
+        4. Quality control based on positive rates
+        5. Aggregating and compressing results
 
         Parameters
         ----------
         week_num : int
-            Week number.
+            Target week number for candidate generation
         trans_df : pd.DataFrame
-            Transaction dataframe.
+            Transaction dataframe with historical purchase data
         customer_list : np.ndarray
-            Target customer list.
+            List of target customer IDs
         rules : List
-            List of rules to retrieve items.
+            List of retrieval rule objects to execute
         filters : List, optional
-            Filters to remove some retrieved items, by default ``[]``.
+            List of filter rule objects to remove unwanted items, by default []
         min_pos_rate : float, optional
-            Minimum positive rate of the generated candidates, by default ``0.01``.
+            Minimum acceptable positive rate for rule results, by default 0.01
         item_id : str, optional
-            Item unit, by default ``"article_id"``.
+            Column name for item IDs, by default "article_id"
         norm : bool, optional
-            Whether to normalize the score, by default ``True``.
+            Whether to normalize rule scores, by default True
         norm_type : str, optional
-            Normalization method, by default ``"quantile"``.
+            Normalization method ('quantile' or 'minmax'), by default "quantile"
         compress : bool, optional
-            Whether to compress the candidate items into a list, by default ``True``.
+            Whether to compress results into lists per user, by default True
 
         Returns
         -------
         pd.DataFrame
-            Dataframe of candidate items.
+            Dataframe with candidate items for each user
         """
         customer_list = np.array(customer_list)
 

@@ -1,3 +1,12 @@
+"""
+Base feature engineering functions for the H&M Fashion Recommendation System.
+
+This module contains fundamental feature engineering functions that create
+temporal, behavioral, and popularity-based features from transaction data.
+These features are essential for capturing user preferences and item
+characteristics in the recommendation models.
+"""
+
 from typing import List
 import pandas as pd
 import numpy as np
@@ -12,33 +21,51 @@ def full_sale(
     week_num: int = 6,
 ) -> np.ndarray:
     """Calculate cumulative sales of each item unit.
+    
+    This function computes the total sales count for each item unit (e.g., 
+    article_id, product_code, etc.) from a specified week onwards. It's useful
+    for capturing the overall popularity and demand for items.
+    
+    The cumulative nature helps identify items that have been consistently
+    popular over time, which is valuable for recommendation systems.
 
     Parameters
     ----------
     trans : pd.DataFrame
-        Dataframe of transaction data.
+        Transaction dataframe with 'week' and 'valid' columns
     groupby_cols : List
-        Item unit.
+        Columns to group by (e.g., ['article_id'] or ['product_code'])
     unique : bool, optional
-        Whether to drop duplicate customer-item pairs, by default ``False``.
+        Whether to count unique customer-item pairs (True) or all transactions (False), 
+        by default False
+    week_num : int, optional
+        Number of weeks to consider for cumulative calculation, by default 6
 
     Returns
     -------
     np.ndarray
-        Array of cumulative sales.
+        Array of cumulative sales counts for each transaction row
     """
+    # Extract relevant columns for processing
     inter = trans[["customer_id", "week", "valid", *groupby_cols]]
     if unique:
+        # Remove duplicate customer-item pairs within the same week
         inter = inter.drop_duplicates(["customer_id", "week", *groupby_cols])
 
+    # Calculate cumulative sales for each week
     tmp_l = []
     for week in range(1, week_num + 1):
+        # Get all transactions from this week onwards
         df = inter[inter["week"] >= week]
+        # Sum sales for each item unit
         df = df.groupby([*groupby_cols])["valid"].sum().reset_index(name="_SALE")
         df["week"] = week
         tmp_l.append(df)
 
+    # Combine all weekly cumulative sales
     df = pd.concat(tmp_l, ignore_index=True)
+    
+    # Merge cumulative sales back to original transaction data
     inter = trans[["customer_id", "week", *groupby_cols]].merge(
         df, on=["week", *groupby_cols], how="left"
     )

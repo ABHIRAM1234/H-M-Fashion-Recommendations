@@ -185,7 +185,7 @@ latex_documents = [
         "index",
         "H-M-Fashion-RecSys.tex",
         "HM-RecSys Documentation",
-        "Wp-Zhang",
+        "Abhiram MV",
         "manual",
     ),
 ]
@@ -216,7 +216,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ("index", "H-M-Fashion-RecSys", "HM-RecSys Documentation", ["Wp-Zhang"], 1)
+    ("index", "H-M-Fashion-RecSys", "HM-RecSys Documentation", ["Abhiram MV"], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -233,7 +233,7 @@ texinfo_documents = [
         "index",
         "H-M-Fashion-RecSys",
         "HM-RecSys Documentation",
-        "Wp-Zhang",
+        "Abhiram MV",
         "HM-RecSys",
         "Kaggle H&M Personalized Fashion Recommendation Contest",
         "Miscellaneous",
